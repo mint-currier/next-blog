@@ -1,11 +1,11 @@
-import { getPostById } from "@/lib/post";
-import { Post } from "@/types/post";
 import { format } from "date-fns";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ja } from "date-fns/locale/ja";
+import { getOwnPost } from "@/lib/ownPost";
+import { auth } from "@/lib/auth";
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -17,11 +17,15 @@ type PostDetailPageParams = {
     id: string;
   }>;
 };
-
-export default async function PostDetailPage({ params }: PostDetailPageParams) {
+export default async function ShowPage({ params }: PostDetailPageParams) {
   const { id } = await params;
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId || !session?.user.email) {
+    throw new Error("不正なリクエストです。");
+  }
 
-  const post = (await getPostById(id)) as Post;
+  const post = await getOwnPost(userId, id);
   if (!post) {
     notFound();
   }
@@ -47,7 +51,7 @@ export default async function PostDetailPage({ params }: PostDetailPageParams) {
             <div className="flex justify-between items-center">
               <p className="text-sm">投稿者: {post.author.name}</p>
               <time className="text-sm">
-                {format(post.createdAt, "yyyy/MM/dd", { locale: ja })}
+                {format(post.createdAt, "yyyy/MM/dd HH:mm:ss", { locale: ja })}
               </time>
             </div>
           </div>

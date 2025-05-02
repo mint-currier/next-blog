@@ -6,7 +6,7 @@ export const authConfig = {
     signIn: "/login",
   },
   callbacks: {
-    authorized({auth, request: {nextUrl}}) {
+    async authorized({auth, request: {nextUrl}}) {
       const isLoggedIn = !!auth?.user;
       const isOnDashboard = nextUrl.pathname.startsWith("/dashboard") || nextUrl.pathname.startsWith("/manage");
       if (isOnDashboard) {
@@ -21,6 +21,20 @@ export const authConfig = {
       }
       return true;
     },
+    async jwt({token, user}) {
+      if (user) {
+        token.id = user.id ?? "";
+      }
+      return token;
+    },
+    async session({session, token}) {
+      if (session.user) {
+        session.user.id = token.id;
+        session.user.name = token.name;
+        session.user.email = token.email ?? "";
+      }
+      return session;
+    }
   }
   
 } satisfies NextAuthConfig;
