@@ -4,13 +4,7 @@ import { format } from "date-fns";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ja } from "date-fns/locale/ja";
 
 type PostDetailPageParams = {
